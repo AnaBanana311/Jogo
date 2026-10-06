@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#263b30">
+  <title>Ilha de Selkirk</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main id="game-shell">
+    <canvas id="game-canvas" width="960" height="540" aria-label="Paisagem pixel art da Ilha de Selkirk"></canvas>
+    <div class="scanlines" aria-hidden="true"></div>
+
+    <section id="main-menu" class="screen-overlay menu-screen main-menu">
+      <div class="menu-layout">
+        <div class="menu-intro">
+          <span class="menu-kicker">DIÁRIO DE SOBREVIVÊNCIA · 1704</span>
+          <h1>ILHA<br><em>SELKIRK</em></h1>
+          <p>Uma ilha inteira entre você<br>e o próximo horizonte.</p>
+          <small id="menu-save-summary">NENHUMA JORNADA SALVA</small>
+        </div>
+        <nav class="menu-actions" aria-label="Menu principal">
+          <button id="continue-button" class="menu-button" disabled>Continuar jornada <span>↗</span></button>
+          <button id="new-game-button" class="menu-button menu-primary">Nova jornada <span>＋</span></button>
+          <button id="collection-button" class="menu-button">Coleção e finais <span>◈</span></button>
+          <button id="options-button" class="menu-button">Opções <span>⚙</span></button>
+          <div class="menu-footer"><span>WASD / SETAS · MOVER</span><span>E · INTERAGIR</span></div>
+        </nav>
+      </div>
+      <span class="menu-version">CAPÍTULO I · O HORIZONTE É A ÚNICA PROMESSA</span>
+    </section>
+
+    <section id="new-game-screen" class="screen-overlay menu-screen sub-menu hidden">
+      <div class="menu-card">
+        <span class="menu-kicker">UMA NOVA HISTÓRIA</span>
+        <h2>Escolha sua jornada</h2>
+        <label for="player-name">Nome do náufrago</label>
+        <input id="player-name" maxlength="16" autocomplete="off" value="Alexander">
+        <label for="difficulty">Dificuldade</label>
+        <select id="difficulty"><option value="calm">Maré calma</option><option value="normal" selected>Sobrevivente</option><option value="hard">Maré brava</option></select>
+        <p>Explore, construa seu abrigo e descubra o que a ilha esconde.</p>
+        <button id="begin-game-button" class="primary-button">DESEMBARCAR <span>↗</span></button>
+        <button id="back-main-from-new" class="text-button">Voltar ao menu</button>
+      </div>
+    </section>
+
+    <section id="collection-screen" class="screen-overlay menu-screen sub-menu hidden">
+      <div class="menu-card">
+        <span class="menu-kicker">MEMÓRIAS DA ILHA</span>
+        <h2>Coleção</h2>
+        <p id="collection-summary">0 de 3 finais descobertos</p>
+        <div class="collection-markers"><span>✦</span><span>✦</span><span>✦</span></div>
+        <p id="collection-endings">Os finais aparecerão aqui quando forem descobertos.</p>
+        <button id="back-main-from-collection" class="text-button">Voltar ao menu</button>
+      </div>
+    </section>
+
+    <section id="options-screen" class="screen-overlay menu-screen sub-menu hidden">
+      <div class="menu-card">
+        <span class="menu-kicker">AJUSTES DA JORNADA</span>
+        <h2>Opções</h2>
+        <label for="setting-volume">Volume <output id="volume-value">70%</output></label>
+        <input id="setting-volume" type="range" min="0" max="100" value="70">
+        <label class="check-row"><input id="setting-motion" type="checkbox"> Movimento reduzido</label>
+        <p>O volume pode ser alterado a qualquer momento nesta tela.</p>
+        <button id="back-main-from-options" class="text-button">Voltar ao menu</button>
+      </div>
+    </section>
+
+    <div id="game-ui" class="hidden">
+      <header class="hud-top">
+        <div class="brand-mark"><span class="brand-icon">✦</span><div><strong>ILHA<br>SELKIRK</strong><small id="day-label">DIA 01</small></div></div>
+        <div class="world-status"><span id="clock-label">06:00</span><span class="status-divider">·</span><span id="weather-label">BRISA QUENTE</span></div>
+        <div class="location"><span class="location-dot"></span><div><small>NÁUFRAGO</small><strong id="player-name-hud">ALEXANDER</strong></div></div>
+        <button id="pause-button" class="icon-button" aria-label="Pausar jogo" title="Pausar">Ⅱ</button>
+      </header>
+
+      <aside class="hud-left">
+        <div class="character-card"><div class="avatar" id="avatar">A</div><div><small>CONDIÇÃO</small><strong>VIVA A ILHA</strong><span id="save-status">DIÁRIO SALVO</span></div></div>
+        <div class="vitals">
+          <div class="vital-row"><span class="vital-icon heart">♥</span><div><div class="vital-label"><span>VIDA</span><b id="hp-text">100 / 100</b></div><div class="bar"><i id="hp-bar" class="red"></i></div></div></div>
+          <div class="vital-row"><span class="vital-icon drop">◆</span><div><div class="vital-label"><span>ÁGUA</span><b id="water-text">78 / 100</b></div><div class="bar"><i id="water-bar" class="blue"></i></div></div></div>
+          <div class="vital-row"><span class="vital-icon apple">●</span><div><div class="vital-label"><span>COMIDA</span><b id="food-text">72 / 100</b></div><div class="bar"><i id="food-bar" class="gold"></i></div></div></div>
+          <div class="vital-row"><span class="vital-icon stamina-icon">↯</span><div><div class="vital-label"><span>FÔLEGO</span><b id="stamina-text">100 / 100</b></div><div class="bar"><i id="stamina-bar" class="green"></i></div></div></div>
+        </div>
+        <div class="quick-resources"><span>▰ <b id="wood-count">0</b></span><span>◆ <b id="stone-count">0</b></span><button id="inventory-button" title="Abrir inventário (I)">Inventário <kbd>I</kbd></button></div>
+      </aside>
+
+      <aside class="hud-right">
+        <div class="quest-panel"><div class="panel-kicker"><span>CAPÍTULO ATUAL</span><b id="quest-count">01 / 14</b></div><h3 id="quest-title">UM LUGAR PARA CHAMAR DE CASA</h3><p id="quest-description">Junte madeira suficiente para se estabelecer.</p><div class="quest-progress"><span id="quest-progress-bar"></span></div><div class="quest-objective"><span>◈</span><span id="quest-objective-text">Madeira</span><b id="quest-progress-text">0 / 8</b></div></div>
+        <div class="discoveries"><div class="panel-kicker"><span>DIÁRIO DA ILHA</span><b>J</b></div><div class="discovery-grid"><span class="found active">◈<small>ILHA</small></span><span class="found">⌂<small>ABRIGO</small></span><span class="found">≈<small>COSTA</small></span><span class="found">?</span></div><button id="journal-button" class="journal-open">Abrir diário</button></div>
+      </aside>
+
+      <div class="hud-bottom">
+        <div class="hint"><kbd>W A S D</kbd><span>MOVER</span><kbd>SHIFT</kbd><span>CORRER</span><kbd>E</kbd><span>USAR</span><kbd>C</kbd><span>CRIAR</span></div>
+        <div class="toast" id="toast">O mar trouxe você até aqui.</div>
+        <div class="coordinates" id="coordinates">X 025 · Y 019</div>
+      </div>
+      <div id="interaction-prompt" class="interaction-prompt hidden"><span class="key">E</span><span id="prompt-text">INTERAGIR</span></div>
+      <div id="touch-controls" class="touch-controls"><button data-key="arrowup">▲</button><div><button data-key="arrowleft">◀</button><button data-key="e">E</button><button data-key="arrowright">▶</button></div><button data-key="arrowdown">▼</button></div>
+      <div class="quick-tools"><button id="crafting-button" title="Criações (C)">Criar <kbd>C</kbd></button><button id="save-button" title="Salvar diário">Salvar</button></div>
+
+      <aside id="inventory-panel" class="game-panel panel-drawer hidden"><div class="panel-heading"><span class="menu-kicker">SEUS RECURSOS</span><button class="icon-button panel-close" data-close-panel aria-label="Fechar inventário">×</button></div><h2>Mochila</h2><div id="inventory-grid" class="inventory-grid"></div></aside>
+      <aside id="crafting-panel" class="game-panel panel-drawer hidden"><div class="panel-heading"><span class="menu-kicker">OFICINA DA ILHA</span><button class="icon-button panel-close" data-close-panel aria-label="Fechar oficina">×</button></div><h2>Criações</h2><p class="panel-intro">Ferramentas, provisões e construções para continuar a jornada.</p><div id="recipe-list" class="recipe-list"></div></aside>
+      <aside id="journal-panel" class="game-panel panel-drawer journal-drawer hidden"><div class="panel-heading"><span class="menu-kicker">CAPÍTULOS E DESCOBERTAS</span><button class="icon-button panel-close" data-close-panel aria-label="Fechar diário">×</button></div><h2>Diário</h2><div id="journal-main"></div><div class="journal-section"><small>TAREFA OPCIONAL DO DIA</small><div id="journal-daily"></div></div><div class="journal-section"><small>LOCAIS DESCOBERTOS</small><div id="journal-optional" class="journal-tags"></div></div></aside>
+    </div>
+
+    <section id="pause-screen" class="screen-overlay pause-overlay hidden"><div class="menu-card"><span class="menu-kicker">DIÁRIO ABERTO</span><h2>Pausa</h2><p>O vento continua, mas o tempo espera por você.</p><button id="resume-button" class="primary-button">RETOMAR <span>↗</span></button><button id="pause-save-button" class="text-button">Salvar jornada</button><button id="main-menu-button" class="text-button">Voltar ao menu</button></div></section>
+    <section id="death-screen" class="screen-overlay ending-overlay hidden"><div class="menu-card death-card"><span class="menu-kicker">DIÁRIO ENCERRADO</span><h2>Fim da jornada</h2><p class="death-cause" id="death-cause"></p><p id="death-message"></p><button id="restart-button" class="primary-button">RECOMEÇAR <span>↻</span></button><button id="death-menu-button" class="text-button">Voltar ao menu</button></div></section>
+    <section id="ending-screen" class="screen-overlay ending-overlay hidden"><div class="menu-card"><span class="menu-kicker">O DESTINO DA ILHA</span><h2>O que vem depois?</h2><p>Você acendeu o farol. Três caminhos se abrem diante de você.</p><button id="ending-rescue" class="menu-button">Pedir resgate <span>↗</span></button><button id="ending-voyage" class="menu-button">Seguir além-mar <span>≈</span></button><button id="ending-guardian" class="menu-button">Ficar na ilha <span>⌂</span></button></div></section>
+    <section id="ending-result" class="screen-overlay ending-overlay hidden"><div class="menu-card"><span class="menu-kicker">FIM DE UMA JORNADA</span><h2 id="ending-result-title">O RESGATE</h2><p id="ending-result-text"></p><button id="final-menu-button" class="primary-button">VOLTAR AO MENU</button></div></section>
+  </main>
+  <script src="game.js"></script>
+</body>
+</html>
