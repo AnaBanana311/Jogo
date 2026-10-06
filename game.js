@@ -695,14 +695,12 @@ const sprites = { down: [makePlayerSprite('down', 0), makePlayerSprite('down', 1
 function drawPlayer() {
   const player = state.player;
   const frame = player.walking ? Math.floor(state.time * 8) % 2 : 0;
-  const left = player.dir === 'left';
-  const direction = left || player.dir === 'right' ? 'right' : player.dir;
+  const direction = player.dir === 'left' || player.dir === 'right' ? 'right' : player.dir;
   const sprite = sprites[direction][frame];
   ctx.fillStyle = 'rgba(25,45,35,.28)'; ctx.fillRect(player.x - 13, player.y + 17, 26, 6);
   ctx.save(); ctx.imageSmoothingEnabled = false;
   if (player.dir === 'right') { ctx.translate(player.x * 2, 0); ctx.scale(-1, 1); }
   ctx.drawImage(sprite, player.x - 16, player.y - 20, 32, 40);
-  if (left) { ctx.restore(); ctx.save(); ctx.translate(player.x * 2, 0); ctx.scale(-1, 1); ctx.drawImage(sprite, player.x - 16, player.y - 20, 32, 40); }
   ctx.restore();
 }
 
